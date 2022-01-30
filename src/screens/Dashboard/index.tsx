@@ -1,5 +1,4 @@
 import React from 'react'
-import { Feather } from '@expo/vector-icons'
 
 import {
     Container,
@@ -11,10 +10,54 @@ import {
     UserGretting,
     UserName,
     Icon,
-    HighlightCards
+    HighlightCards,
+    TransactionsList,
+    Transactions,
+    Title,
 } from './styles'
 
 import { HighlightCard } from '../../components/HighlightCard'
+import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard'
+
+export interface DataListProps extends TransactionCardProps {
+    id: string;
+}
+
+const data: DataListProps[] = [
+    {
+        id: '1',
+        type: 'positive',
+        title: "Desenvolvimento de site",
+        amount: "R$ 12.000,00",
+        category: {
+            name: 'Vendas',
+            icon: 'dollar-sign'
+        },
+        date: "13/04/2022"
+    },
+    {
+        id: '2',
+        type: 'negative',
+        title: "Hamburger Pizzy",
+        amount: "R$ 59,00",
+        category: {
+            name: 'Alimentação',
+            icon: 'coffee'
+        },
+        date: "13/04/2022"
+    },
+    {
+        id: '3',
+        type: 'negative',
+        title: "Aluguel do apartamento",
+        amount: "R$ 1.200,00",
+        category: {
+            name: 'Casa',
+            icon: 'shopping-bag'
+        },
+        date: "13/04/2022"
+    }
+]
 
 export function Dashboard () {
     return (
@@ -56,6 +99,16 @@ export function Dashboard () {
                     lastTransaction="01 à 15 de abril"
                 />
             </HighlightCards>
+
+            <Transactions>
+                <Title>Listagem</Title>
+
+                <TransactionsList
+                    data={data}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => <TransactionCard data={item} />}
+                />
+            </Transactions>
         </Container>
     )
 }
