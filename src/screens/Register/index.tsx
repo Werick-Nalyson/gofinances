@@ -3,7 +3,6 @@ import { Modal } from 'react-native'
 
 import { Container, Header, Title, Form, Fields, TransactionsTypes } from './styles'
 import { Button } from '../../components/Forms/Button'
-import { Input } from '../../components/Forms/Input'
 import { TransactionTypeButton } from '../../components/Forms/TransactionTypeButton'
 import { CategorySelectButton } from '../../components/Forms/CategorySelectButton'
 import { CategorySelect } from '../CategorySelect'
@@ -26,12 +25,7 @@ export function Register () {
     const {
         control,
         handleSubmit
-    } = useForm<FormData>({
-        defaultValues: {
-            amount: '',
-            name: ''
-        }
-    })
+    } = useForm<FormData>()
 
     function handleTransactionTypeSelected (type: 'up' | 'down') {
         setTransactionType(type)
@@ -66,7 +60,6 @@ export function Register () {
                     <InputForm
                         control={control}
                         name="amount"
-                        keyboardType="numeric"
                         placeholder="Preço"
                     />
 
