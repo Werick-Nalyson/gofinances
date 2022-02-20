@@ -48,8 +48,6 @@ const schema = Yup.object().shape({
     .required('O valor e obrigatorio')
 })
 
-const dataKey = "@gofinances:transactions"
-
 export function Register () {
     const [transactionType, setTransactionType] = useState('')
     const [categoryModalOpen, setCategoryModalOpen] = useState(false)
@@ -71,7 +69,7 @@ export function Register () {
         resolver: yupResolver(schema)
     })
 
-    function handleTransactionTypeSelected (type: 'up' | 'down') {
+    function handleTransactionTypeSelected (type: 'positive' | 'negative') {
         setTransactionType(type)
     }
 
@@ -103,12 +101,14 @@ export function Register () {
             id: String(uuid.v4()),
             name: form.name,
             amount: form.amount,
-            transactionType,
+            type: transactionType,
             category: category.key,
             date: new Date()
         }
 
         try {
+            const dataKey = "@gofinances:transactions"
+
             const data = await AsyncStorage.getItem(dataKey)
             const currentData = data ? JSON.parse(data) : []
 
@@ -116,8 +116,6 @@ export function Register () {
                 ...currentData,
                 newTransaction
             ]
-
-            console.log(dataFormatted)
 
             await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted))
 
@@ -160,14 +158,14 @@ export function Register () {
                         <TransactionTypeButton 
                             title="Income"
                             type="up"
-                            onPress={() => handleTransactionTypeSelected('up')}
-                            isActive={transactionType === 'up'}
+                            onPress={() => handleTransactionTypeSelected('positive')}
+                            isActive={transactionType === 'positive'}
                         />
                         <TransactionTypeButton 
                             title="Outcome"
                             type="down"
-                            onPress={() => handleTransactionTypeSelected('down')}
-                            isActive={transactionType === 'down'}
+                            onPress={() => handleTransactionTypeSelected('negative')}
+                            isActive={transactionType === 'negative'}
                         />
                     </TransactionsTypes>
 
