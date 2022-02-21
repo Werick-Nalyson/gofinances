@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native'
+import { useTheme } from 'styled-components/native'
+import { VictoryPie } from 'victory-native'
 
 import { HistoryCard } from '../../components/HistoryCard'
 
@@ -7,11 +10,12 @@ import {
     Container,
     Header,
     Title,
+    ChartContainer,
     Content
 } from './styles'
 import { TransactionCardProps } from '../../components/TransactionCard'
 import { categories } from '../../utils/categories'
-import { useFocusEffect, useIsFocused } from '@react-navigation/native'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 export interface DataListProps extends TransactionCardProps {
     id: string;
@@ -20,12 +24,16 @@ export interface DataListProps extends TransactionCardProps {
 interface expensiveType {
     key: string;
     name: string;
-    total: string;
+    total: number;
+    totalFormatted: string;
     color: string;
+    percent: string;
 }
 
 export function Resume () {
     const [expensivesByCategory, setExpensivesByCategory] = useState<expensiveType[]>([])
+
+    const theme = useTheme()
 
     async function loadExpensives () {
         try {
@@ -38,6 +46,10 @@ export function Resume () {
             const expensives: DataListProps[] = responseFormatted
                 .filter((item: DataListProps) => item.type === 'negative')
 
+            const expensivesTotal = expensives.reduce((acumulator: number, item) => {
+                return acumulator + Number(item.amount)
+            }, 0)
+
             const totalByCategory: expensiveType[] = []
 
             categories.forEach(category => {
@@ -48,9 +60,11 @@ export function Resume () {
                         categorySum += Number(expensive.amount)
                     }
                 })
+
+                const percent = `${(categorySum / expensivesTotal * 100).toFixed(0)}%`
                 
                 if (categorySum > 0) {
-                    const total = categorySum.toLocaleString('pt-BR', {
+                    const totalFormatted = categorySum.toLocaleString('pt-BR', {
                         style: "currency",
                         currency: "BRL"
                     })
@@ -59,7 +73,9 @@ export function Resume () {
                         key: category.key,
                         name: category.name,
                         color: category.color,
-                        total,
+                        totalFormatted,
+                        total: categorySum,
+                        percent
                     })
                 }
             })
@@ -85,12 +101,29 @@ export function Resume () {
                 <Title>Resumo</Title>
             </Header>
 
+            <ChartContainer>
+                <VictoryPie
+                    data={expensivesByCategory}
+                    colorScale={expensivesByCategory.map(category => category.color)}
+                    style={{
+                        labels: {
+                            fontSize: RFValue(18),
+                            fontWeight: "bold",
+                            fill: theme.colors.shape
+                        }
+                    }}
+                    labelRadius={50}
+                    x="percent"
+                    y="total"
+                />
+            </ChartContainer>
+
             <Content>
                 {expensivesByCategory.map(expensive => (
                     <HistoryCard
                         key={expensive.key}
                         title={expensive.name}
-                        amount={expensive.total}
+                        amount={expensive.totalFormatted}
                         color={expensive.color}
                     />
                 ))}
