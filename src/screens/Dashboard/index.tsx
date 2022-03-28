@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import { ActivityIndicator } from 'react-native'
 
@@ -25,6 +25,8 @@ import {
 import { HighlightCard } from '../../components/HighlightCard'
 import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard'
 import { useTheme } from 'styled-components'
+import { useContextAuth } from '../../contexts/AuthContext'
+import { TouchableOpacity } from 'react-native'
 
 export interface DataListProps extends TransactionCardProps {
     id: string;
@@ -52,6 +54,8 @@ export function Dashboard () {
     const [highlightData, setHighlightData] = useState<HighlightData>({} as HighlightData)
 
     const theme = useTheme()
+
+    const { signOut, user } = useContextAuth()
 
     function getLastTransactionDate (collection: DataListProps[], type: 'positive' | 'negative'): LastTransactionDateType {
         const lastTransactions = collection
@@ -180,16 +184,18 @@ export function Dashboard () {
                             <UserWrapper>
                                 <UserInfo>
                                     <Photo
-                                        source={{ uri: 'https://media-exp1.licdn.com/dms/image/C4E03AQHuFwvjCgyr9w/profile-displayphoto-shrink_800_800/0/1599278928625?e=1649289600&v=beta&t=UHm5GEDcYLYTreKBtC5WgEVADuAf5At-Tno80FFMiqc' }}
+                                        source={{ uri: user?.photo }}
                                     />
 
                                     <User>
                                         <UserGretting>Olá, </UserGretting>
-                                        <UserName>Werick</UserName>
+                                        <UserName>{user.name}</UserName>
                                     </User>
                                 </UserInfo>
                                 
-                                <Icon name="power" />
+                                <TouchableOpacity onPress={signOut}>
+                                    <Icon name="power" />
+                                </TouchableOpacity>
                             </UserWrapper>
                         </Header>
 
